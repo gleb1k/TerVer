@@ -5,10 +5,22 @@ import kotlin.math.pow
 public class Combinatorics {
     //Перестановки
     companion object {
-        fun permutations(n: Int): Double {
-            return factorial(n)
+        fun permutationsWORepetitions(n: Int): Double = factorial(n)
+        fun permutationsWRepetitions(n: Int, m : List<Int>): Double {
+            var msum = 0
+            m.forEach {
+                msum += it
+            }
+            if (m.isEmpty() || msum != n)
+            {
+                return (-1).toDouble()
+            }
+            var result = factorial(n)
+            m.forEach {
+                result /= factorial(it)
+            }
+            return result
         }
-
         private fun factorial(n: Int): Double {
             var result = 1.0
             for (i in 1..n) {
