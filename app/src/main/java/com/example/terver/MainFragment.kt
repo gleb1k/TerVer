@@ -1,5 +1,6 @@
 package com.example.terver
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -17,6 +18,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private var binding: FragmentMainBinding? = null
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -33,118 +35,173 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             btnCalc.setOnClickListener {
                 val position = spinner.selectedItemPosition.toString().toInt()
 
-                if (etN.text.isNullOrEmpty() || etM.text.isNullOrBlank() ) {
-                    tvResult.text = "Введите значение"
-                } else {
+                if (checkN() && checkM()) {
                     n = etN.text.toString().toInt()
-                    if (position!=1)
-                    m = etM.text.toString().toInt()
-                    else{
-                        m = 0
-                        list.clear()
-                        val arrStr = etM.text.split(" ")
-                        val lenght = arrStr.size
-                        for (index in 0 until lenght) {
-                            val a = arrStr[index].toInt()
-                            if (a<=0)
-                            {
-                                tvResult.text = "Некорректные значения"
-                                list.clear()
-                                break
-                            }
+                    if (position != 1) {
+                        if (etM.visibility != View.GONE) {
+                            m = etM.text.toString().toInt()
+                        }
+                    } else
+                        readArray()
+
+                    when (position) {
+                        0 -> {
+                            tvResult.text = "${spinner.selectedItem} : ${
+                                Combinatorics.permutationsWORepetitions(n)
+                            }"
+                        }
+                        1 -> {
+                            if (list.isNullOrEmpty())
+                                tvResult.text = "Что-то введено не так"
                             else {
-                                list.add(a)
+                                val result = Combinatorics.permutationsWRepetitions(n, list)
+                                if (result == (-1).toDouble())
+                                    tvResult.text = "Некорректные значения"
+                                else
+                                    tvResult.text = "${spinner.selectedItem} : $result"
                             }
                         }
-                    }
-                }
+                        2 -> {
+                            val result = Combinatorics.placementsWORepetitions(
+                                n,
+                                m
+                            )
+                            if (result == (-1).toDouble())
+                                tvResult.text = "Некорректные значения"
+                            else
+                                tvResult.text = "${spinner.selectedItem} : $result"
+                        }
+                        3 -> {
+                            tvResult.text = "${spinner.selectedItem} : ${
+                                Combinatorics.placementsWRepetitions(
+                                    n,
+                                    m
+                                )
+                            }"
+                        }
+                        4 -> {
+                            val result = Combinatorics.combinationsWORepetitions(
+                                n,
+                                m
+                            )
+                            if (result == (-1).toDouble())
+                                tvResult.text = "Некорректные значения"
+                            else
+                                tvResult.text = "${spinner.selectedItem} : $result"
+                        }
+                        5 -> {
+                            tvResult.text = "${spinner.selectedItem} : ${
+                                Combinatorics.combinationsWRepetitions(
+                                    n,
+                                    m
+                                )
+                            }"
+                        }
 
-                when(position){
-                    0 -> {
-                        tvResult.text = "${spinner.selectedItem} : ${Combinatorics.permutationsWORepetitions(n)}"
-                    }
-                    1 -> {
-                        val result = Combinatorics.permutationsWRepetitions(n, list)
-                        if (result == (-1).toDouble())
-                            tvResult.text = "Некорректные значения"
-                        else
-                            tvResult.text = "${spinner.selectedItem} : ${result}"
-                    }
-                    2 -> {
-                        tvResult.text = "${spinner.selectedItem} : ${Combinatorics.placementsWORepetitions(n,m)}"
-                    }
-                    3 -> {
-                        tvResult.text = "${spinner.selectedItem} : ${Combinatorics.placementsWRepetitions(n,m)}"
-                    }
-                    4 -> {
-                        tvResult.text = "${spinner.selectedItem} : ${Combinatorics.combinationsWRepetitions(n,m)}"
-                    }
-                    5 -> {
-                        tvResult.text = "${spinner.selectedItem} : ${Combinatorics.combinationsWORepetitions(n,m)}"
                     }
                 }
             }
 
             spinner.adapter = adapter
-
-            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
                     tvResult.text = "Выберите перестановку"
                 }
-                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    when(position){
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    when (position) {
                         0 -> {
                             etM.isEnabled = false
                             etM.visibility = View.GONE
+                            etM.text.clear()
                         }
                         1 -> {
                             etM.isEnabled = true
                             etM.hint = "Введите n1 n2 ... nk (через пробел)"
                             etM.visibility = View.VISIBLE
-                            etM.inputType = InputType.TYPE_CLASS_PHONE
+                            etM.inputType = InputType.TYPE_TEXT_VARIATION_PASSWORD
+                            etM.text.clear()
                         }
                         2 -> {
                             etM.isEnabled = true
                             etM.hint = "Введите m"
                             etM.visibility = View.VISIBLE
                             etM.inputType = InputType.TYPE_CLASS_NUMBER
+                            etM.text.clear()
                         }
                         3 -> {
                             etM.isEnabled = true
                             etM.hint = "Введите m"
                             etM.visibility = View.VISIBLE
                             etM.inputType = InputType.TYPE_CLASS_NUMBER
+                            etM.text.clear()
                         }
                         4 -> {
                             etM.isEnabled = true
                             etM.hint = "Введите m"
                             etM.visibility = View.VISIBLE
                             etM.inputType = InputType.TYPE_CLASS_NUMBER
+                            etM.text.clear()
                         }
                         5 -> {
                             etM.isEnabled = true
                             etM.hint = "Введите m"
                             etM.visibility = View.VISIBLE
                             etM.inputType = InputType.TYPE_CLASS_NUMBER
+                            etM.text.clear()
                         }
                     }
                 }
             }
 
 
-
         }
+    }
+
+    private fun checkN(): Boolean {
+        if (binding!!.etN.text.isNullOrEmpty()) {
+            binding!!.tvResult.text = "Введите значение"
+            return false
+        }
+        return true
+
+    }
+
+    private fun checkM(): Boolean {
+        if (binding!!.etM.text.isNullOrEmpty())
+            if (binding!!.etM.visibility != View.GONE) {
+                binding!!.tvResult.text = "Введите значение"
+                return false
+            }
+        return true
+    }
+
+
+    private fun readArray(): MutableList<Int> {
+        binding?.run {
+            list.clear()
+            val arrStr = etM.text.split(" ")
+            val lenghtArr = arrStr.size
+            for (index in 0 until lenghtArr) {
+                try {
+                    val a = arrStr[index].toInt()
+                        list.add(a)
+                } catch (e: NumberFormatException) {
+                    tvResult.text = "Это не число!"
+                    list.clear()
+                }
+            }
+        }
+        return list
     }
 
     companion object {
 
         const val MAIN_FRAGMENT_TAG = "Main_FRAGMENT_TAG"
-
-        fun newInstance(message: String) =
-            MainFragment().apply {
-                arguments = Bundle().apply {
-                    putString(MAIN_FRAGMENT_TAG, message)
-                }
-            }
     }
 }

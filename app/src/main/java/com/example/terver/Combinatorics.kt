@@ -6,6 +6,7 @@ public class Combinatorics {
     //Перестановки
     companion object {
         fun permutationsWORepetitions(n: Int): Double = factorial(n)
+
         fun permutationsWRepetitions(n: Int, m : List<Int>): Double {
             var msum = 0
             m.forEach {
@@ -14,6 +15,10 @@ public class Combinatorics {
             if (m.isEmpty() || msum != n)
             {
                 return (-1).toDouble()
+            }
+            m.forEach{
+                if (it < 0)
+                    return (-1).toDouble()
             }
             var result = factorial(n)
             m.forEach {
@@ -31,16 +36,18 @@ public class Combinatorics {
 
         //Сочетания без повторений
         fun combinationsWORepetitions(n: Int, m: Int): Double {
-            return factorial(n) / (factorial(n - m) * factorial(m))
+            if (m>n) return (-1).toDouble()
+            return factorial(n) / factorial(n - m) / factorial(m)
         }
 
         //Сочетания с повтороениями
         fun combinationsWRepetitions(n: Int, m: Int): Double {
-            return combinationsWORepetitions(n + m - 1, m)
+            return factorial(n+m-1)/ factorial(m) / factorial(n - 1)
         }
 
         //Размещения без повторений
         fun placementsWORepetitions(n: Int, m: Int): Double {
+            if (m>n) return (-1).toDouble()
             return factorial(n) / factorial(n - m)
         }
 
